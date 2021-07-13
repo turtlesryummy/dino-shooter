@@ -15,7 +15,7 @@ sprites.onCreated(SpriteKind.Enemy, function (sprite) {
     statusbar2.attachToSprite(sprite, 0, 0)
     statusbar2.value = 100
     sprites.setDataNumber(myEnemy, "Health", 2)
-    animation.runImageAnimation(
+    characterAnimations.loopFrames(
     sprite,
     [img`
         . . . . f f f f f . . . . . . . 
@@ -104,13 +104,118 @@ sprites.onCreated(SpriteKind.Enemy, function (sprite) {
         . . f f f f f f f f f f f f f . 
         `],
     100,
-    true
+    characterAnimations.rule(Predicate.MovingLeft)
     )
+    characterAnimations.loopFrames(
+    sprite,
+    [img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . . f e e e d d d d f . . 
+        . . . . f f e e d f d d f d c . 
+        . . . f d d e e d f d d f d c . 
+        . . . c d b e e d d d d e e d c 
+        f f . c d b e e d d c d d d d c 
+        f e f . c f e e d d d c c c c c 
+        f e f . . f f e e d d d d d f . 
+        f e f . f e e e e f f f f f . . 
+        f e f f e e e e e e e f . . . . 
+        . f f e e e e f e f f e f . . . 
+        . . f e e e e f e f f e f . . . 
+        . . . f e f f b d f b d f . . . 
+        . . . f d b b d d c d d f . . . 
+        . . . f f f f f f f f f . . . . 
+        `,img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . . f e e e d d d d f . . 
+        . . . . . f e e d f d d f d c . 
+        . . . . f f e e d f d d f d c . 
+        . . . f d d e e d d d d e e d c 
+        . . . c d b e e d d c d d d d c 
+        f f . c d b e e e d d c c c c c 
+        f e f . c f f e e e d d d d f . 
+        f e f . f e e e e f f f f f f . 
+        f e f f e e e e e e e f f f f . 
+        . f f e e e e f e f d d f d d f 
+        . . f e e e e f e f b d f b d f 
+        . . f e f f f f f f f f f f f f 
+        . . f d d c f . . . . . . . . . 
+        . . f f f f . . . . . . . . . . 
+        `,img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . f f e e e d d d d f . . 
+        . . . f d d e e d d d d d d c . 
+        . . . c d b e e d f d d f d c . 
+        f f . c d b e e d f d d f d d c 
+        f e f . c f e e d d d d e e d c 
+        f e f . . f e e e d c d d d d c 
+        f e f . . f f e e e d c c c f . 
+        f e f . f e e e e f f f f f . . 
+        . f f f e e e e e e e f . . . . 
+        . . f e e e e f e e f e f f . . 
+        . . f e e e f f f e e f f e f . 
+        . f b f f f f f f c d d b d d f 
+        . f d d c f . . f d d d c d d f 
+        . . f f f . . . f f f f f f f . 
+        `,img`
+        . . . . . . . f f f f f . . . . 
+        . . . . f f f e e e e e f . . . 
+        . . . f d d e e e e d d d f . . 
+        . . . c d b e e e d d d d d c . 
+        . . . c d b e e d d d d d d c . 
+        . f f . c f e e d f d d f d d c 
+        f e f . . f e e d f d d f d d c 
+        f e f . . f e e d d d d e e d c 
+        f e f . . f f e e d c d d d f . 
+        f e f . f e e e e e d f f f . . 
+        . f f f e e e e e e e f . . . . 
+        . . f f b e e e e e f f . . . . 
+        . . f f d d c e e f f e f . . . 
+        . . . . f f f c d d b d d f . . 
+        . . . . . f f d d d c d d f . . 
+        . . . . . . f f f f f f f . . . 
+        `,img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . . f e e e d d d d f . . 
+        . . . . f f e e d f d d f d c . 
+        . . . f d d e e d f d d f d c . 
+        . . . c d b e e d d d d e e d c 
+        . . . c d b e e d d c d d d d c 
+        . . . . c f e e e d d c c c c c 
+        . . . . . f f e e e d d d d f . 
+        . . . . f e e e e f f f f f . . 
+        f f . f e e e e e e f f . . . . 
+        f e . f e e f e e f e e f . . . 
+        f e . f e e e f e e f e e f . . 
+        f e f f e f b b f b d f d b f . 
+        f f f f e b d d f d d f d d f . 
+        . f f f f f f f f f f f f f . . 
+        `],
+    100,
+    characterAnimations.rule(Predicate.MovingRight)
+    )
+    enemyAI()
 })
+function enemyAI () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        if (distance(mySprite.x, value.x, mySprite.y, value.y) < 120) {
+            value.follow(mySprite, 30)
+        }
+        if (value.isHittingTile(CollisionDirection.Bottom) && (tiles.tileAtLocationEquals(tiles.locationInDirection(tiles.getTileLocation(tiles.locationXY(tiles.locationOfSprite(value), tiles.XY.column), tiles.locationXY(tiles.locationOfSprite(value), tiles.XY.row)), CollisionDirection.Left), assets.tile`transparency16`) || tiles.tileAtLocationEquals(tiles.locationInDirection(tiles.getTileLocation(tiles.locationXY(tiles.locationOfSprite(value), tiles.XY.column), tiles.locationXY(tiles.locationOfSprite(value), tiles.XY.row)), CollisionDirection.Right), assets.tile`transparency16`))) {
+            value.setVelocity(0, 0)
+        }
+    }
+}
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         mySprite.vy = -250
     }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
+    game.over(false)
 })
 function playerAnimations () {
     characterAnimations.loopFrames(
@@ -920,6 +1025,9 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     music.footstep.play()
     music.thump.play()
 })
+scene.onOverlapTile(SpriteKind.Enemy, assets.tile`myTile`, function (sprite, location) {
+    sprite.destroy()
+})
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
     status.spriteAttachedTo().destroy()
 })
@@ -1059,37 +1167,63 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
     sprite.destroy()
     scene.cameraShake(4, 200)
 })
+function nextLevel () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.destroy()
+    }
+    if (currentLevel == 1) {
+        tiles.setTilemap(tilemap`level1`)
+        currentLevel += 1
+    } else if (currentLevel == 2) {
+        scene.setBackgroundColor(9)
+        tiles.setTilemap(tilemap`level2`)
+        currentLevel += 1
+    } else {
+        game.over(true)
+    }
+}
+function distance (num: number, num2: number, num3: number, num4: number) {
+    return Math.sqrt((num - num2) ** 2 + (num3 - num4) ** 2)
+}
 sprites.onCreated(SpriteKind.Projectile, function (sprite) {
     sprite.startEffect(effects.warmRadial, 100)
     sprite.setFlag(SpriteFlag.DestroyOnWall, true)
 })
 function spawnEnemy () {
-    for (let value of tiles.getTilesByType(sprites.builtin.field1)) {
-        myEnemy = sprites.create(img`
-            . . . . f f f f f . . . . . . . 
-            . . . f e e e e e f . . . . . . 
-            . . f d d d d e e e f . . . . . 
-            . c d f d d f d e e f f . . . . 
-            . c d f d d f d e e d d f . . . 
-            c d e e d d d d e e b d c . . . 
-            c d d d d c d d e e b d c . f f 
-            c c c c c d d d e e f c . f e f 
-            . f d d d d d e e f f . . f e f 
-            . . f f f f f e e e e f . f e f 
-            . . . . f e e e e e e e f f e f 
-            . . . f e f f e f e e e e f f . 
-            . . . f e f f e f e e e e f . . 
-            . . . f d b f d b f f e f . . . 
-            . . . f d d c d d b b d f . . . 
-            . . . . f f f f f f f f f . . . 
-            `, SpriteKind.Enemy)
-        tiles.placeOnTile(myEnemy, value)
-        myEnemy.follow(mySprite, 30)
-        myEnemy.ay = 700
+    if (sprites.allOfKind(SpriteKind.Enemy).length < 9) {
+        for (let value of tiles.getTilesByType(sprites.builtin.field1)) {
+            myEnemy = sprites.create(img`
+                . . . . f f f f f . . . . . . . 
+                . . . f e e e e e f . . . . . . 
+                . . f d d d d e e e f . . . . . 
+                . c d f d d f d e e f f . . . . 
+                . c d f d d f d e e d d f . . . 
+                c d e e d d d d e e b d c . . . 
+                c d d d d c d d e e b d c . f f 
+                c c c c c d d d e e f c . f e f 
+                . f d d d d d e e f f . . f e f 
+                . . f f f f f e e e e f . f e f 
+                . . . . f e e e e e e e f f e f 
+                . . . f e f f e f e e e e f f . 
+                . . . f e f f e f e e e e f . . 
+                . . . f d b f d b f f e f . . . 
+                . . . f d d c d d b b d f . . . 
+                . . . . f f f f f f f f f . . . 
+                `, SpriteKind.Enemy)
+            tiles.placeOnTile(myEnemy, value)
+            myEnemy.ay = 700
+        }
+    } else {
+        for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+            value.destroy()
+            if (sprites.allOfKind(SpriteKind.Enemy).length == 9) {
+                break;
+            }
+        }
     }
 }
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
-    game.over(true)
+    nextLevel()
 })
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (sprites.readDataNumber(otherSprite, "Health") == 0) {
@@ -1236,7 +1370,9 @@ let statusbar2: StatusBarSprite = null
 let statusbar: StatusBarSprite = null
 let shark: Sprite = null
 let mySprite: Sprite = null
-tiles.setTilemap(tilemap`level1`)
+let currentLevel = 0
+currentLevel = 1
+nextLevel()
 mySprite = sprites.create(img`
     ........................
     ........................
@@ -1285,6 +1421,9 @@ statusbar.setLabel("HP")
 statusbar.positionDirection(CollisionDirection.Top)
 statusbar.setColor(7, 1, 3)
 statusbar.setBarBorder(1, 1)
+game.onUpdate(function () {
+    enemyAI()
+})
 forever(function () {
     controller.moveSprite(mySprite, vx, 0)
     if (sharkDirec == 0) {
